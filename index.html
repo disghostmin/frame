@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+	<title>Tradutor</title>
+	<meta charset="utf-8">
+	<style type="text/css">/*CSS dentro do HTML*/
+
+		.invisivel{
+
+			 display: none;
+
+		}
+		.visivel{
+
+			display: static;
+
+		}
+	</style>
+
+</head>
+<body>
+
+<div id="menu" class="visivel"><!--Página inicial-->
+<fieldset>
+
+	<h1>Boas vindas!</h1>
+	<h2>O que deseja no nosso sistema de tradução?</h2>
+	<button onclick="tela(2)">Inserir</button>
+	<button onclick="tela(3)">Editar</button>
+	<button onclick="tela(4)">Mostrar Todos</button>
+
+</fieldset>
+</div>
+
+<div id="ins" class="invisivel"><!--Página para inserir-->
+
+	<fieldset>
+
+		<legend>Inserir</legend>
+		<p>Insira as informações no nosso sistema.</p>
+		<p><input type="text" id="eng" placeholder="Palavra em inglês"></p>
+		<p><input type="text" id="pt" placeholder="Palavra em português"></p>
+		<p><input type="text" id="desc" placeholder="Uso diário da Palavra"></p>
+		<button onclick="reg(eng.value, pt.value, desc.value)">Registrar</button>
+		<button onclick="tela(1)">Voltar</button>
+		<p id="resposta"></p>
+
+	</fieldset>
+
+</div>
+
+<div id="edit" class="invisivel"><!--Página para modificar-->
+
+	<fieldset>
+
+		<legend>Editar</legend>
+		<p>Informações erradas? arrume aqui!</p>
+		<p><input type="text" id="txter" placeholder="Palavra em inglês"></p>
+		<button onclick="buscar(txter.value, 1)">Buscar</button>
+		<button onclick="tela(1)">Voltar</button>
+	
+			<div id="alter" class="invisivel">
+				<p><input type="text" id="alteng" placeholder="Palavra em inglês alterada"></p>
+				<p><input type="text" id="altpt" placeholder="Palavra em português alterada"></p>
+				<p><input type="text" id="altdesc" placeholder="Uso diário da Palavra alterado"></p>
+				<button onclick="altsave(alteng.value, altpt.value, altdesc.value)">Salvar</button>
+				<button onclick="tela(1)">Voltar</button>
+			
+			</div>
+	</fieldset>
+
+</div>
+
+<div id="show" class="invisivel"><!--Mostrar todos-->
+	<fieldset>
+	<h1>Dicionário</h1>
+	<p id="most"></p>
+	<button onclick="mostrar()">Mostrar</button>
+	<button onclick="tela(1)">Voltar</button>
+	</fieldset>
+</div>
+
+</body>
+
+<script type="text/javascript">
+
+	/*Class para construir no banco de dados*/
+	class Dicionario{
+			constructor()
+	{
+		let ingles;
+		let portugues;
+		let descricao;
+	}
+	}
+
+	/*Coloquei uma var aq para não ter que escrever a mesma let toda hora.*/
+
+	var nomeBanco = "Dicionario";
+
+	/*Função para mudanças de página*/
+	function tela(x) {
+
+		switch(x){
+
+			case 1:
+
+			menu.className = "visivel";
+			ins.className = "invisivel";
+			edit.className = "invisivel";
+			show.className = "invisivel";
+
+			break;
+
+			case 2:
+
+			menu.className = "invisivel";
+			ins.className = "visivel";
+		
+			break;
+
+			case 3:
+
+			menu.className = "invisivel";
+			edit.className = "visivel";
+		
+			break;
+
+			case 4:
+
+			menu.className = "invisivel";
+			show.className = "visivel";
+		
+			break;
+
+		}
+	}
+
+	/*Função para registrar no armazenamento local*/
+	function reg(a, b, c) {
+		
+		if(a.length == 0 || b.length == 0 || c.length == 0)
+
+		{
+			alert("Todos os campos devem ser preenchidos!")
+			
+		}
+
+		else
+		{
+			let vetor = [];
+
+			let system = new Dicionario();
+			system.ingles = a;
+			system.portugues = b;
+			system.descricao = c;
+
+			if(localStorage.getItem(nomeBanco)==null)
+			{
+				vetor.push(system);
+				localStorage.setItem(nomeBanco,JSON.stringify(vetor));
+			}
+			else
+			{
+				vetor = JSON.parse(localStorage.getItem(nomeBanco));
+				vetor.push(system);
+				localStorage.setItem(nomeBanco,JSON.stringify(vetor));
+			}
+			alert("Palavra cadastrada com sucesso!");
+			tela(1);
+		}
+
+	}
+
+	/*Função para buscar algo no armazenamento*/
+	function buscar(x, op)
+{
+	let vetor = [];
+	let achou = false;	
+	vetor = JSON.parse(localStorage.getItem(nomeBanco));
+
+	for(i=0;i<vetor.length;i++)
+			{
+				if(x == vetor[i].ingles)
+				{
+					achou = true;
+					posicao = i;
+				}
+			}
+	
+	switch(op)
+	{
+		case 1:
+			if(achou)
+				
+			{
+				document.getElementById('alter').className="visivel";
+				alteng.value = vetor[posicao].ingles;
+				altpt.value = vetor[posicao].portugues;
+				altdesc.value = vetor[posicao].descricao;
+			}
+			else
+			{
+				alert("Palavra não encontrada");	
+			}
+		break;
+
+	}
+}
+
+	/*Função para alterar algo do armazenamento local*/
+	function altsave(pe, pp, dp)
+	{
+		if(pe.length == 0 || pp.length == 0 || dp.length == 0)
+		{
+			alert("Todos os campos devem ser preenchidos!")
+			
+		}
+		else
+		{
+			let vetor = [];
+
+			
+			let system = new Dicionario();
+			system.ingles = pe;
+			system.portugues = pp;
+			system.descricao = dp;
+
+			vetor = JSON.parse(localStorage.getItem(nomeBanco));
+			vetor[posicao] = system;
+			localStorage.setItem(nomeBanco,JSON.stringify(vetor));
+
+			alert("Palavra atualizada com sucesso!");
+			tela(1);
+		}
+
+	}
+
+	/*Função para mostrar os registros do armazenamento local*/
+	function mostrar()
+{ 	
+	
+	let vetor = [];
+	resposta = document.getElementById('most');
+	resposta.innerHTML = "";
+	vetor = JSON.parse(localStorage.getItem(nomeBanco));
+
+	if(vetor==null)
+	{
+		resposta.innerHTML = "<h1>Não existem palavras armazenadas</h1>"
+		
+	}
+	else
+	{
+		for(i=0;i<vetor.length;i++)
+		{
+			resposta.innerHTML += "<hr><p>Palavra em inglês: "+vetor[i].ingles+"</p>";
+			resposta.innerHTML += "<p>Palavra em português: "+vetor[i].portugues+"</p>"
+			resposta.innerHTML += "<p>Frase usando a palavra: "+vetor[i].descricao+"</p>"
+		}
+		
+	}
+}
+
+/*Olá Professor! Tô vindo aqui no final para te agradecer pela ajuda, nesse bimestre eu consegui compreender muito bem o conteudo, isso me deixa feliz, espero que eu consiga passar na sua materia!*/
+
+</script>
+
+</html>
